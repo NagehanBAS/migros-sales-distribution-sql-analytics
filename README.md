@@ -1,17 +1,35 @@
 
 # Migros Sales Distribution | SQL Analytics Case Study
 
-**SQLite · Retail Analytics · Category Performance · Customer Segmentation · Sales KPIs**
+**SQLite · Retail Analytics · Category Management · Customer Analytics · Executive Reporting**
 
-An end-to-end SQL analytics case study exploring retail sales performance, category revenue distribution, customer purchasing behavior, and recent sales trends using a 400-record educational dataset.
+An end-to-end retail analytics case study transforming 400 educational sales records into actionable commercial insights through SQL analysis and an executive sales dashboard.
 
 > **Disclaimer:** This is an independent Workintech educational case study. It is not affiliated with Migros and does not represent the company's actual financial or operational performance.
+
+## Live Executive Dashboard
+
+### [View the Interactive-Style Executive Sales Dashboard](https://nagehanbas.github.io/migros-sales-distribution-sql-analytics/dashboard/)
+
+The dashboard provides a visual, management-oriented summary of the project's SQL findings.
+
+**Dashboard Highlights:**
+- Executive KPI scorecard
+- Revenue performance by product category
+- Leading-category product revenue mix
+- Repeat customer purchasing behavior
+- Latest 60-day sales performance
+- Commercial insights and management takeaways
+
+**Dashboard technology:** HTML5 and CSS3
+
+The dashboard is a responsive, static analytical snapshot based on the SQL query results. It does not use a live database connection or interactive filtering.
 
 ---
 
 ## Executive Summary
 
-This project analyzes retail transactions to identify revenue drivers, compare product categories, evaluate customer purchasing behavior, and examine recent sales performance.
+This project analyzes retail sales performance to identify revenue drivers, evaluate product category contributions, examine repeat customer behavior, and assess recent sales trends.
 
 | KPI | Result |
 |---|---:|
@@ -22,10 +40,10 @@ This project analyzes retail transactions to identify revenue drivers, compare p
 | Maximum Line Revenue | 277.50 |
 | Average Line Revenue | 43.45 |
 | Highest-Revenue Category | Bebek ve Çocuk |
-| Highest Category Net Revenue | 3,835.18 |
+| Leading Category Revenue | 3,835.18 |
 | Customers with Multiple Orders | 11 |
 
-**Key Finding:** The Baby & Children category generated the highest net revenue, narrowly outperforming Home & Living. Within the leading category, two product types contributed approximately 96.70% of revenue.
+**Key Finding:** The Baby & Children category generated the highest net revenue, narrowly outperforming Home & Living. Within the leading category, two product types contributed approximately 96.70% of total category revenue.
 
 All monetary figures are expressed in dataset units. No currency is assumed.
 
@@ -38,19 +56,19 @@ The analysis addresses six business questions:
 1. What are the overall sales volume and revenue indicators?
 2. Which product categories generate the highest net revenue?
 3. How is revenue distributed across subcategories and product types?
-4. Which customers make repeat purchases, and how do their basket values differ?
+4. Which customers make repeat purchases, and how do their average basket values differ?
 5. How does the leading category perform during the latest 60-day period?
-6. What insights can be communicated to retail management?
+6. What commercial insights can support management decision-making?
 
-The objective is to convert transaction-level retail data into interpretable business metrics.
+The objective is to translate transaction-level retail data into structured performance indicators and business recommendations.
 
 ---
 
 ## Dataset Overview
 
-The analysis uses a single relational table: `purchases`.
+The analysis uses a single source table: `purchases`.
 
-**Dataset size:** 400 sales records
+**Dataset size:** 400 sales records.
 
 ### Data Dictionary
 
@@ -71,25 +89,21 @@ The analysis uses a single relational table: `purchases`.
 | `cost_price` | Recorded cost price |
 | `quantity` | Recorded product quantity |
 
-Some transactions contain missing product types, membership labels, or promotion labels.
-
 ### Data Granularity
 
 Each row represents one recorded sales line.
 
-A single order may contain multiple sales lines. Consequently, sales record counts and unique order counts are not interchangeable.
+A single order may contain multiple sales lines, meaning sales record counts and unique order counts are not interchangeable.
 
-The dataset includes labels referencing multiple retail brands and membership programs. These values are preserved as supplied rather than treated as verified Migros customer classifications.
+The dataset includes labels referencing multiple retailers, campaigns, and membership programs. These values are preserved as supplied.
 
 ---
 
 ## Analytical Methodology
 
-The project follows six sequential tasks.
-
 ### Task 1 — Database Setup and Validation
 
-Create the `purchases` table, insert the supplied records, and verify the data import.
+Create the `purchases` table, load the educational dataset, and verify successful data import.
 
 ```sql
 SELECT COUNT(*) AS total_records
@@ -100,43 +114,43 @@ FROM purchases;
 
 ### Task 2 — Overall Sales Metrics
 
-Calculate total sales records, unique orders, total net revenue, and minimum, maximum, and average line-level net revenue in one query.
+Calculate total sales records, unique order counts, net revenue, and minimum, maximum, and average line-level revenue.
 
-**Key SQL functions:** `COUNT`, `DISTINCT`, `SUM`, `MIN`, `MAX`, `AVG`, `ROUND`
+**SQL techniques:** `COUNT`, `DISTINCT`, `SUM`, `MIN`, `MAX`, `AVG`, `ROUND`
 
-**Result:** 397 unique orders and 17,379.35 in total recorded net revenue.
+**Result:** 397 unique orders and 17,379.35 in recorded net revenue.
 
 ### Task 3 — Category Sales Performance
 
-Aggregate transaction records by category, calculate revenue and order counts, filter low-volume categories, and rank the remaining categories by revenue.
+Aggregate records by category, calculate revenue and order counts, filter low-volume groups, and rank categories by revenue.
 
-**Key SQL clauses:** `GROUP BY`, `HAVING`, `ORDER BY DESC`
+**SQL techniques:** `GROUP BY`, `HAVING`, `ORDER BY DESC`
 
-A minimum threshold of 10 sales records per category was selected for the category-level summary.
+A minimum threshold of 10 sales records per category was selected.
 
 ### Task 4 — Subcategory and Product Type Analysis
 
-Analyze the leading category by combining `subcategory` and `product_type` dimensions.
+Analyze the highest-revenue category by combining `subcategory` and `product_type` dimensions.
 
-Calculate each combination's net revenue, order count, and percentage contribution to the leading category's total revenue.
+Calculate revenue, order counts, and percentage contribution to category revenue.
 
-**Key SQL techniques:** Multi-column `GROUP BY`, scalar subquery, `NULLIF`, percentage calculation.
+**SQL techniques:** Multi-column `GROUP BY`, scalar subquery, `NULLIF`, percentage calculation.
 
 ### Task 5 — Customer Purchase and Basket Metrics
 
-Calculate customer-level spending, unique order counts, and average basket values.
+Calculate customer-level spending, order frequency, and average basket value.
 
-Order-level revenue is calculated before customer-level aggregation to avoid confusing transaction lines with complete shopping baskets.
+Order-level revenue is calculated before customer-level aggregation to avoid treating individual transaction lines as complete baskets.
 
-**Key SQL techniques:** Common table expression (`WITH`), nested aggregation, `HAVING COUNT(*) > 1`.
+**SQL techniques:** Common table expressions, nested aggregation, `HAVING`.
 
 ### Task 6 — Last 60 Days Category Analysis
 
-Analyze the highest-revenue category during the 60 days preceding the dataset's latest order date.
+Analyze the leading category during the period anchored to the latest order date available in the dataset.
 
-The analysis uses a dynamic date reference rather than a hard-coded calendar date.
+**SQL techniques:** `MAX`, SQLite `date()`, `GROUP BY`, `SUM`, `COUNT`.
 
-**Key SQL functions:** `MAX`, SQLite `date()`, `GROUP BY`, `SUM`, `COUNT`.
+The analysis uses a dynamic date reference instead of a hard-coded calendar date.
 
 ---
 
@@ -144,7 +158,7 @@ The analysis uses a dynamic date reference rather than a hard-coded calendar dat
 
 ### 1. Category Revenue Performance
 
-Categories are ranked by total recorded net revenue, with a minimum of 10 sales records.
+Categories are ranked by recorded net revenue, including only those with at least 10 sales records.
 
 | Category | Sales Records | Unique Orders | Net Revenue |
 |---|---:|---:|---:|
@@ -156,33 +170,35 @@ Categories are ranked by total recorded net revenue, with a minimum of 10 sales 
 | Bahçe ve Evcil Hayvan | 10 | 10 | 185.92 |
 | Güzellik ve Hijyen | 14 | 14 | 117.90 |
 
-**Insight:** Bebek ve Çocuk leads Ev ve Yaşam by just 3.42 in net revenue, despite generating fewer sales records.
+**Commercial Insight:** Baby & Children leads Home & Living by only 3.42 in net revenue, despite having substantially fewer sales records.
 
-Revenue performance is therefore not determined by transaction volume alone.
+Transaction volume alone does not determine revenue leadership.
 
-### 2. Leading Category: Subcategory and Product Type Breakdown
+### 2. Leading Category Revenue Mix
 
-The highest-revenue category is **Bebek ve Çocuk**, with total net revenue of 3,835.18.
+**Leading category:** Bebek ve Çocuk
 
-| Subcategory | Product Type | Net Revenue | Revenue Share |
-|---|---|---:|---:|
-| Bebek Bezi ve Bakım | Yıkanabilir Bebek Bezi | 1,983.37 | 51.72% |
-| Çocuk Hobi Ürünleri | Boya ve Boyama Seti | 1,725.07 | 44.98% |
-| Çocuk Ulaşım Ürünleri | Üç Tekerlekli Bisiklet | 52.55 | 1.37% |
-| Bebek Bezi ve Bakım | Yıkanabilir Bebek Külotu | 29.06 | 0.76% |
-| Bebek Bezi ve Bakım | Yıkanabilir Havuz Bezi | 26.47 | 0.69% |
-| Çocuk Hobi Ürünleri | Oyun Hamuru | 16.49 | 0.43% |
-| Bebek Bezi ve Bakım | Yıkanabilir Bez Bakımı | 2.17 | 0.06% |
+**Category net revenue:** 3,835.18
 
-**Insight:** The top two product types contribute approximately 96.70% of the leading category's revenue.
+| Product Type | Net Revenue | Revenue Share |
+|---|---:|---:|
+| Yıkanabilir Bebek Bezi | 1,983.37 | 51.72% |
+| Boya ve Boyama Seti | 1,725.07 | 44.98% |
+| Üç Tekerlekli Bisiklet | 52.55 | 1.37% |
+| Yıkanabilir Bebek Külotu | 29.06 | 0.76% |
+| Yıkanabilir Havuz Bezi | 26.47 | 0.69% |
+| Oyun Hamuru | 16.49 | 0.43% |
+| Yıkanabilir Bez Bakımı | 2.17 | 0.06% |
 
-This concentration suggests that monitoring a small number of product groups could be useful for category performance reviews.
+**Commercial Insight:** The two highest-revenue product types account for approximately 96.70% of the category's revenue.
+
+This revenue concentration highlights the importance of monitoring assortment performance and product availability.
 
 Percentages may not sum to exactly 100% because of rounding.
 
 ### 3. Repeat Customer Analysis
 
-The analysis identified **11 customers with more than one distinct order**.
+The analysis identified 11 customers with more than one distinct order.
 
 | Customer ID | Total Spending | Orders | Average Basket Value |
 |---|---:|---:|---:|
@@ -198,13 +214,11 @@ The analysis identified **11 customers with more than one distinct order**.
 | 105468 | 5.66 | 2 | 2.83 |
 | 107565 | 4.11 | 2 | 2.05 |
 
-**Insight:** Customer 47166 has the highest spending among repeat customers, while customer 115043 has the highest order frequency.
+**Commercial Insight:** Customer 47166 generates the highest spending among repeat customers, while customer 115043 has the highest order frequency.
 
-This illustrates the distinction between spending intensity and purchasing frequency.
+This demonstrates why customer spending and purchase frequency should be evaluated separately.
 
-Average basket value is calculated as total order revenue divided by the number of distinct customer orders.
-
-### 4. Last 60 Days of Leading-Category Sales
+### 4. Latest 60-Day Category Performance
 
 The analysis dynamically filters Bebek ve Çocuk transactions based on the latest order date in the dataset.
 
@@ -214,30 +228,62 @@ The analysis dynamically filters Bebek ve Çocuk transactions based on the lates
 | Çocuk Hobi Ürünleri | 22 | 22 | 1,693.85 |
 | **Total** | **45** | **45** | **3,638.92** |
 
-**Insight:** Bebek Bezi ve Bakım contributed approximately 53.45% of the revenue in the selected period.
+**Commercial Insight:** Bebek Bezi ve Bakım accounts for approximately 53.45% of the leading category's revenue in the selected period.
 
-The selected 60-day window accounts for approximately 94.88% of the leading category's total recorded revenue.
+The selected period accounts for approximately 94.88% of the leading category's total recorded revenue.
 
-The time window is relative to the latest date in the dataset, not the date the query is executed.
+---
+
+## Executive Dashboard
+
+The project includes a responsive HTML/CSS dashboard published through GitHub Pages.
+
+### Dashboard Components
+
+| Component | Purpose |
+|---|---|
+| Executive KPI Scorecard | Summarize overall sales performance |
+| Category Revenue Chart | Compare revenue contributions across product categories |
+| Product Revenue Mix | Highlight revenue concentration within the leading category |
+| Repeat Customer Table | Compare customer spending, purchase frequency, and basket value |
+| Recent Sales Analysis | Summarize the latest 60-day leading-category performance |
+| Management Takeaways | Translate analytical findings into commercial observations |
+
+**[Open the Live Executive Sales Dashboard](https://nagehanbas.github.io/migros-sales-distribution-sql-analytics/dashboard/)**
+
+### Management Takeaways
+
+**Category Management**
+
+Monitor Baby & Children and Home & Living closely because their revenue contributions are nearly identical despite different sales volumes.
+
+**Assortment Analysis**
+
+Investigate the strong concentration of revenue in washable baby diapers and coloring sets. Further margin and stock-availability data would support commercial decision-making.
+
+**Customer Analytics**
+
+Evaluate repeat customers by both frequency and total spending. A more extensive transaction history could support RFM segmentation.
+
+These recommendations are exploratory and should not be treated as validated business interventions.
 
 ---
 
 ## SQL Techniques Demonstrated
 
-- Dataset creation and import validation
-- Sales record and unique order counting
-- Revenue aggregation with `SUM`
+- Database creation and data import
+- Source record validation
+- Revenue aggregation
+- Distinct order counting
 - Minimum, maximum, and average calculations
-- Multi-dimensional category segmentation
-- Aggregate filtering with `HAVING`
-- Descending revenue rankings
-- Numeric precision with `ROUND`
-- Percentage calculations with `NULLIF`
-- Scalar subqueries
-- Common table expressions (CTEs)
+- Category performance ranking
+- Aggregate filtering using `HAVING`
+- Multi-dimensional grouping
+- Percentage calculations using `NULLIF`
+- Common table expressions
 - Order-level and customer-level aggregation
-- Dynamic date filtering in SQLite
-- Translating transaction data into business insights
+- Dynamic date filtering
+- Commercial KPI reporting
 
 ---
 
@@ -246,6 +292,8 @@ The time window is relative to the latest date in the dataset, not the date the 
 ```text
 migros-sales-distribution-sql-analytics/
 ├── README.md
+├── dashboard/
+│   └── index.html
 └── sql/
     ├── 01_database_setup.sql
     ├── 02_overall_sales_metrics.sql
@@ -255,15 +303,15 @@ migros-sales-distribution-sql-analytics/
     └── 06_last_60_days_analysis.sql
 ```
 
-### SQL Scripts
+### SQL Files
 
 **01 — Database Setup**
 
-Creates the `purchases` table, inserts the educational dataset, and validates the record count.
+Creates the `purchases` table, inserts the educational dataset, and validates the imported records.
 
 **02 — Overall Sales Metrics**
 
-Calculates overall transaction volume, unique order counts, and net revenue statistics.
+Calculates sales volume, unique orders, and overall revenue statistics.
 
 **03 — Category Performance**
 
@@ -271,15 +319,21 @@ Ranks category revenue and applies a minimum sales-volume threshold.
 
 **04 — Subcategory and Product Analysis**
 
-Examines revenue distribution across subcategories and product types within the leading category.
+Evaluates product-type performance and revenue shares within the leading category.
 
 **05 — Customer Basket Analysis**
 
-Identifies repeat customers and calculates spending and average basket values.
+Identifies repeat customers and calculates customer spending and average basket values.
 
 **06 — Last 60 Days Analysis**
 
-Analyzes recent subcategory performance using a dynamic date window.
+Examines recent subcategory performance using a dynamic date window.
+
+### Dashboard
+
+**dashboard/index.html**
+
+A self-contained, responsive HTML/CSS executive dashboard presenting selected analytical findings.
 
 ---
 
@@ -287,7 +341,7 @@ Analyzes recent subcategory performance using a dynamic date window.
 
 **Requirements:** SQLite 3
 
-Create a fresh SQLite database and run the scripts in numeric order.
+Create a fresh SQLite database and execute the scripts in numeric order.
 
 ```bash
 sqlite3 migros_sales.db < sql/01_database_setup.sql
@@ -298,9 +352,11 @@ sqlite3 -header -column migros_sales.db < sql/05_customer_basket_analysis.sql
 sqlite3 -header -column migros_sales.db < sql/06_last_60_days_analysis.sql
 ```
 
-Alternatively, execute the SQL scripts in order using [SQLite Online](https://sqliteonline.com/).
+Alternatively, run the scripts sequentially in [SQLite Online](https://sqliteonline.com/).
 
-The setup script is intended for a fresh database to avoid conflicts with existing tables.
+To view the dashboard locally, open `dashboard/index.html` in a web browser.
+
+To view the published dashboard, use the GitHub Pages link above.
 
 ---
 
@@ -308,45 +364,53 @@ The setup script is intended for a fresh database to avoid conflicts with existi
 
 ### Revenue Definition
 
-The project uses the provided `net_price` column as recorded line-level net revenue, following the educational task specification.
+The project uses `net_price` as recorded line-level net revenue according to the educational task specification.
 
-The dataset also includes `quantity`, but the analysis does not multiply `net_price` by quantity.
+Although the dataset includes `quantity`, the analysis does not multiply `net_price` by quantity.
 
-Therefore, reported totals should not be interpreted as independently verified unit-price-based sales revenue.
+Reported totals should therefore not be interpreted as independently verified unit-price-based revenue.
 
-### Sales Records vs. Orders
+### Sales Records vs. Unique Orders
 
-A sales record represents a row in the source table, while a unique order is identified by `order_id`.
+Sales records are individual rows in the dataset.
 
-These measures are reported separately when appropriate.
+Unique orders are identified using `order_id`.
 
-### Average Basket Value
+These metrics are reported separately to avoid double-counting orders.
 
-Customer basket values are computed using aggregated order totals, rather than averaging raw transaction lines.
+### Basket Value Calculation
 
-### Low-Volume Category Filtering
+Average basket value is calculated after aggregating transaction lines into complete customer orders.
 
-The category ranking excludes categories with fewer than 10 sales records.
+### Category Filtering
 
-This threshold is an analytical choice, not a business-defined minimum.
+Category rankings exclude groups with fewer than 10 sales records.
 
-### Historical Date Window
+This is an analyst-defined threshold rather than a company-defined business rule.
 
-The last-60-days analysis is anchored to the latest order date available in the dataset.
+### Dynamic Date Window
 
-The date range is not intended to represent the most recent 60 calendar days relative to today.
+The latest 60-day analysis is anchored to the maximum order date in the dataset.
+
+It does not represent the latest 60 calendar days relative to the present.
+
+### Dashboard Scope
+
+The dashboard is based on validated SQL query outputs and uses fixed values.
+
+It does not currently support live database queries, automated refreshes, or interactive filters.
 
 ### Educational Data
 
-The dataset contains synthetic-style retail examples and references multiple retailers, campaigns, and loyalty programs.
+The dataset contains educational retail records referencing multiple companies, campaigns, and membership programs.
 
-The project does not verify whether these labels represent real commercial relationships.
+The project does not verify these as real commercial relationships.
 
-### Analytical Scope
+### Analytical Limitations
 
-Findings are descriptive and based on a limited educational dataset.
+The findings are descriptive and are based on a small educational dataset.
 
-They are not intended as causal claims or statistically significant estimates of real-world retail performance.
+They should not be interpreted as statistically significant or causal conclusions about real-world retail operations.
 
 ---
 
@@ -356,13 +420,14 @@ Potential extensions include:
 
 - Gross margin and profitability analysis
 - Promotion effectiveness measurement
-- Customer segmentation using RFM analysis
+- Customer RFM segmentation
 - Category contribution and Pareto analysis
-- Interactive Power BI dashboards
-- Monthly revenue and customer retention monitoring
+- Interactive Power BI reporting
+- Monthly revenue trend monitoring
 - Automated data quality checks
+- Database-connected dashboard refreshes
 
-These are possible future extensions and are not included in the current implementation.
+These are potential extensions and are not included in the current implementation.
 
 ---
 
@@ -372,11 +437,12 @@ These are possible future extensions and are not included in the current impleme
 |---|---|
 | Project | Migros Sales Distribution — SQL Analytics |
 | Program | Workintech — Data Science & AI |
-| Technology | SQLite 3 |
+| Database | SQLite 3 |
+| Dashboard | HTML5, CSS3, GitHub Pages |
 | Domain | Retail and Commercial Analytics |
-| Focus | Category Management, Customer Analytics, Sales KPIs |
-| Type | Independent Educational Portfolio Project |
+| Focus Areas | Category Management, Customer Analytics, Sales KPIs, Executive Reporting |
+| Project Type | Independent Educational Portfolio Project |
 
 ---
 
-**Author:** Nagehan BAS
+**Author:** Nagehan Baş
