@@ -1,0 +1,575 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
+  <title>Migros | Executive Sales Dashboard</title>
+  <style>
+    :root {
+      --bg: #f5f7f5;
+      --surface: #ffffff;
+      --ink: #183329;
+      --muted: #718178;
+      --green: #18734a;
+      --light-green: #eaf5ee;
+      --border: #e5ebe6;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont,
+                   "Segoe UI", Arial, sans-serif;
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: auto;
+      padding: 36px 24px 64px;
+    }
+
+    .eyebrow {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--green);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    h1 {
+      font-size: clamp(28px, 4vw, 42px);
+      letter-spacing: -1.5px;
+      margin: 8px 0;
+    }
+
+    h2 {
+      font-size: 19px;
+      margin: 0 0 8px;
+    }
+
+    p { color: var(--muted); }
+
+    .subtitle {
+      margin-top: 4px;
+      font-size: 14px;
+    }
+
+    .grid {
+      display: grid;
+      gap: 18px;
+    }
+
+    .metrics {
+      grid-template-columns: repeat(4, 1fr);
+      margin: 30px 0;
+    }
+
+    .two-col {
+      grid-template-columns: 1.4fr 1fr;
+      margin-bottom: 18px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      min-width: 0;
+    }
+
+    .metric-label {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .metric-value {
+      display: block;
+      font-size: clamp(25px, 3vw, 35px);
+      font-weight: 750;
+      letter-spacing: -1px;
+      margin-top: 9px;
+    }
+
+    .metric-note {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 4px;
+    }
+
+    .section-note {
+      font-size: 13px;
+      margin: 0 0 24px;
+    }
+
+    .bar-row {
+      display: grid;
+      grid-template-columns: 155px 1fr 78px;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 18px;
+      font-size: 12px;
+    }
+
+    .bar-label {
+      overflow-wrap: anywhere;
+      font-weight: 500;
+    }
+
+    .bar-track {
+      background: #edf2ee;
+      height: 14px;
+      border-radius: 20px;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      width: var(--w);
+      background: var(--green);
+      border-radius: 20px;
+    }
+
+    .bar-value {
+      text-align: right;
+      font-weight: 650;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .insight {
+      background: var(--light-green);
+      border-radius: 12px;
+      padding: 16px;
+      font-size: 13px;
+      margin-top: 18px;
+      color: var(--ink);
+    }
+
+    .insight strong {
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    .share-row {
+      display: flex;
+      height: 28px;
+      border-radius: 7px;
+      overflow: hidden;
+      margin: 22px 0 15px;
+      background: #edf2ee;
+    }
+
+    .share-main { background: #18734a; width: 51.72%; }
+    .share-second { background: #7eb99a; width: 44.98%; }
+    .share-other { background: #d4e4d8; flex: 1; }
+
+    .legend {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      font-size: 13px;
+    }
+
+    .legend-item {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .legend-left {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+
+    .dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      font-size: 13px;
+    }
+
+    th {
+      color: var(--muted);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      text-align: left;
+    }
+
+    th, td {
+      padding: 13px 10px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    th:first-child, td:first-child { padding-left: 0; }
+    th:last-child, td:last-child { padding-right: 0; }
+
+    .num {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .green { color: var(--green); font-weight: 700; }
+
+    .kicker {
+      margin-bottom: 14px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--green);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .big-number {
+      font-size: 34px;
+      font-weight: 750;
+      letter-spacing: -1px;
+      margin: 12px 0 0;
+    }
+
+    .footer {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 28px;
+      border-top: 1px solid var(--border);
+      padding-top: 20px;
+    }
+
+    @media (max-width: 900px) {
+      .metrics { grid-template-columns: repeat(2, 1fr); }
+      .two-col { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 560px) {
+      .container { padding: 24px 14px; }
+      .metrics { gap: 10px; }
+      .card { padding: 17px; }
+      .bar-row {
+        grid-template-columns: 110px 1fr 65px;
+        gap: 7px;
+        font-size: 11px;
+      }
+      .metric-value { font-size: 24px; }
+      th, td { padding: 10px 5px; font-size: 11px; }
+    }
+  </style>
+</head>
+
+<body>
+<main class="container">
+
+  <header>
+    <div class="eyebrow">Retail Intelligence / SQL Analytics</div>
+    <h1>Executive Sales Dashboard</h1>
+    <p class="subtitle">
+      Migros Sales Distribution Case Study |
+      Educational Dataset | SQLite
+    </p>
+  </header>
+
+  <!-- EXECUTIVE KPI SCORECARD -->
+  <section class="grid metrics" aria-label="Sales KPIs">
+    <div class="card">
+      <div class="metric-label">Total Net Revenue</div>
+      <span class="metric-value">17,379.35</span>
+      <div class="metric-note">Recorded dataset units</div>
+    </div>
+
+    <div class="card">
+      <div class="metric-label">Unique Orders</div>
+      <span class="metric-value">397</span>
+      <div class="metric-note">Distinct order IDs</div>
+    </div>
+
+    <div class="card">
+      <div class="metric-label">Sales Records</div>
+      <span class="metric-value">400</span>
+      <div class="metric-note">Transaction lines</div>
+    </div>
+
+    <div class="card">
+      <div class="metric-label">Average Line Revenue</div>
+      <span class="metric-value">43.45</span>
+      <div class="metric-note">Average recorded net price</div>
+    </div>
+  </section>
+
+  <!-- CATEGORY PERFORMANCE -->
+  <section class="grid two-col">
+    <div class="card">
+      <h2>Revenue by Product Category</h2>
+      <p class="section-note">
+        Net revenue | Categories with at least 10 records
+      </p>
+
+      <div class="bar-row">
+        <span class="bar-label">Baby & Children</span>
+        <div class="bar-track">
+          <div class="bar-fill" style="--w:100%"></div>
+        </div>
+        <span class="bar-value">3,835.18</span>
+      </div>
+
+      <div class="bar-row">
+        <span class="bar-label">Home & Living</span>
+        <div class="bar-track">
+          <div class="bar-fill" style="--w:99.91%"></div>
+        </div>
+        <span class="bar-value">3,831.76</span>
+      </div>
+
+      <div class="bar-row">
+        <span class="bar-label">Beverages</span>
+        <div class="bar-track">
+          <div class="bar-fill" style="--w:87.33%"></div>
+        </div>
+        <span class="bar-value">3,349.35</span>
+      </div>
+
+      <div class="bar-row">
+        <span class="bar-label">Health & Personal Care</span>
+        <div class="bar-track">
+          <div class="bar-fill" style="--w:76.56%"></div>
+        </div>
+        <span class="bar-value">2,936.13</span>
+      </div>
+
+      <div class="bar-row">
+        <span class="bar-label">Snacks & Sweets</span>
+        <div class="bar-track">
+          <div class="bar-fill" style="--w:75.90%"></div>
+        </div>
+        <span class="bar-value">2,911.06</span>
+      </div>
+
+      <div class="bar-row">
+        <span class="bar-label">Garden & Pets</span>
+        <div class="bar-track">
+          <div class="bar-fill" style="--w:4.85%"></div>
+        </div>
+        <span class="bar-value">185.92</span>
+      </div>
+
+      <div class="bar-row">
+        <span class="bar-label">Beauty & Hygiene</span>
+        <div class="bar-track">
+          <div class="bar-fill" style="--w:3.07%"></div>
+        </div>
+        <span class="bar-value">117.90</span>
+      </div>
+
+      <div class="insight">
+        <strong>Commercial Insight 01</strong>
+        Baby & Children leads Home & Living by only 3.42
+        in net revenue, despite having 57 sales records
+        compared with 95.
+      </div>
+    </div>
+
+    <!-- PRODUCT REVENUE MIX -->
+    <div class="card">
+      <h2>Leading Category Revenue Mix</h2>
+      <p class="section-note">
+        Baby & Children | Net revenue share
+      </p>
+
+      <div class="kicker">Category Total</div>
+      <div class="big-number">3,835.18</div>
+
+      <div class="share-row" aria-label="Revenue distribution">
+        <div class="share-main"></div>
+        <div class="share-second"></div>
+        <div class="share-other"></div>
+      </div>
+
+      <div class="legend">
+        <div class="legend-item">
+          <div class="legend-left">
+            <span class="dot" style="background:#18734a"></span>
+            Washable Baby Diapers
+          </div>
+          <strong>51.72%</strong>
+        </div>
+
+        <div class="legend-item">
+          <div class="legend-left">
+            <span class="dot" style="background:#7eb99a"></span>
+            Painting & Coloring Sets
+          </div>
+          <strong>44.98%</strong>
+        </div>
+
+        <div class="legend-item">
+          <div class="legend-left">
+            <span class="dot" style="background:#d4e4d8"></span>
+            Other Product Types
+          </div>
+          <strong>3.30%</strong>
+        </div>
+      </div>
+
+      <div class="insight">
+        <strong>Commercial Insight 02</strong>
+        Two product types contribute approximately 96.70%
+        of total revenue in the leading category,
+        indicating a concentrated product revenue mix.
+      </div>
+    </div>
+  </section>
+
+  <!-- CUSTOMER AND RECENT SALES -->
+  <section class="grid two-col">
+    <div class="card">
+      <h2>Repeat Customer Performance</h2>
+      <p class="section-note">
+        Selected customers ranked by total spending
+      </p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Customer ID</th>
+            <th class="num">Orders</th>
+            <th class="num">Spending</th>
+            <th class="num">Avg. Basket</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="green">47166</td>
+            <td class="num">2</td>
+            <td class="num">296.49</td>
+            <td class="num">148.25</td>
+          </tr>
+          <tr>
+            <td>115043</td>
+            <td class="num">5</td>
+            <td class="num">34.14</td>
+            <td class="num">6.83</td>
+          </tr>
+          <tr>
+            <td>100671</td>
+            <td class="num">2</td>
+            <td class="num">29.87</td>
+            <td class="num">14.94</td>
+          </tr>
+          <tr>
+            <td>91426</td>
+            <td class="num">2</td>
+            <td class="num">25.64</td>
+            <td class="num">12.82</td>
+          </tr>
+          <tr>
+            <td>5742</td>
+            <td class="num">2</td>
+            <td class="num">21.44</td>
+            <td class="num">10.72</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="insight">
+        <strong>Commercial Insight 03</strong>
+        The highest-spending repeat customer is not
+        the most frequent purchaser. Spending value
+        and order frequency should be monitored separately.
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Latest 60-Day Category Performance</h2>
+      <p class="section-note">
+        Baby & Children | Window anchored to
+        the dataset's latest order date
+      </p>
+
+      <div class="kicker">Period Net Revenue</div>
+      <div class="big-number">3,638.92</div>
+
+      <div style="margin-top:26px">
+        <div class="legend-item">
+          <span>Baby Care & Diapers</span>
+          <strong>1,945.07</strong>
+        </div>
+        <div class="bar-track" style="margin:9px 0 23px">
+          <div class="bar-fill" style="--w:53.45%"></div>
+        </div>
+
+        <div class="legend-item">
+          <span>Children's Hobbies</span>
+          <strong>1,693.85</strong>
+        </div>
+        <div class="bar-track" style="margin:9px 0 23px">
+          <div class="bar-fill" style="--w:46.55%"></div>
+        </div>
+      </div>
+
+      <div class="insight">
+        <strong>Commercial Insight 04</strong>
+        Baby Care & Diapers generated 53.45% of
+        the leading category's net revenue during
+        the selected period.
+      </div>
+    </div>
+  </section>
+
+  <!-- MANAGEMENT TAKEAWAYS -->
+  <section class="card">
+    <h2>Management Takeaways</h2>
+    <p class="section-note">
+      Evidence-based observations and suggested follow-up analyses
+    </p>
+
+    <p>
+      <strong>Category Management:</strong>
+      Monitor Baby & Children and Home & Living closely,
+      as their recorded net revenue is nearly identical
+      despite different transaction volumes.
+    </p>
+
+    <p>
+      <strong>Assortment Analysis:</strong>
+      Investigate the strong revenue concentration
+      in washable baby diapers and coloring sets.
+      Product-level margin and availability data
+      would help evaluate commercial opportunities.
+    </p>
+
+    <p>
+      <strong>Customer Analytics:</strong>
+      Segment repeat purchasers by order frequency
+      and total spending. Consider RFM analysis
+      when a larger customer history is available.
+    </p>
+  </section>
+
+  <footer class="footer">
+    <strong>Author:</strong> Nagehan Baş |
+    Workintech Data Science & AI |
+    Independent Educational Case Study
+    <p>
+      Static analytical snapshot derived from SQL query results.
+      Not connected to a live database.
+      Monetary units are unspecified.
+      The analysis is not affiliated with Migros.
+    </p>
+  </footer>
+
+</main>
+</body>
+</html>
